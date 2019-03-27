@@ -1,12 +1,9 @@
 <template>
   <div>
+    {{ accounts[1].name }}
     <v-data-table :headers="headers" :items="accounts" item-key="accountId">
       <template v-slot:items="props">
-        <tr
-          :class="{'table-primary' : isSelected(props.item)}"
-          :active="props.selected"
-          @click="select(props.item)"
-        >
+        <tr :class="{'table-primary' : isSelected(props.item)}" @click="select(props.item)">
           <td>{{ props.item.accountId }}</td>
           <td>{{ props.item.name }}</td>
           <td>{{ props.item.type }}</td>
@@ -21,18 +18,22 @@
 
       <v-card>
         <v-card-title class="headline grey lighten-2" primary-title>Add Account</v-card-title>
-
         <v-card-text>
           <v-container grid-list-md>
             <v-layout wrap>
               <v-flex xs12>
-                <v-text-field label="Account name*" required></v-text-field>
+                <v-text-field label="Account name*" required v-model="selected.name"></v-text-field>
               </v-flex>
               <v-flex xs12>
-                <v-text-field label="Account id*" required></v-text-field>
+                <v-text-field label="Account id*" required v-model="selected.accountId"></v-text-field>
               </v-flex>
               <v-flex xs12 sm6>
-                <v-select :items="accountTypes" label="Account type*" required></v-select>
+                <v-select
+                  :items="accountTypes"
+                  label="Account type*"
+                  required
+                  v-model="selected.type"
+                ></v-select>
               </v-flex>
             </v-layout>
           </v-container>
@@ -43,36 +44,39 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" flat @click="addAccount">Save</v-btn>
-          <v-btn color="secondary" flat @click="addDialog = false">Cancel</v-btn>
+          <v-btn color="primary" flat @click="saveAccount(true)">Save</v-btn>
+          <v-btn color="secondary" flat @click="hideAddDialog">Cancel</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-dialog v-model="editDialog" width="500">
       <template v-slot:activator="{ on }">
-        <v-btn v-on="on" :disabled="selected.length == 0">Edit</v-btn>
+        <v-btn v-on="on" :disabled="selected.accountId === -1">Edit</v-btn>
       </template>
 
       <v-card>
         <v-card-title class="headline grey lighten-2" primary-title>Edit Account</v-card-title>
 
         <v-card-text>
-          <v-form>
-            <v-container grid-list-md>
-              <v-layout wrap>
-                <v-flex xs12>
-                  <v-text-field label="Account name*" required></v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <v-text-field label="Account id*" required></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6>
-                  <v-select :items="accountTypes" label="Account type*" required></v-select>
-                </v-flex>
-              </v-layout>
-            </v-container>
-          </v-form>
+          <v-container grid-list-md>
+            <v-layout wrap>
+              <v-flex xs12>
+                <v-text-field label="Account name*" required v-model="selected.name"></v-text-field>
+              </v-flex>
+              <v-flex xs12>
+                <v-text-field label="Account id*" required v-model="selected.accountId"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm6>
+                <v-select
+                  :items="accountTypes"
+                  label="Account type*"
+                  required
+                  v-model="selected.type"
+                ></v-select>
+              </v-flex>
+            </v-layout>
+          </v-container>
           <small>*indicates required field</small>
         </v-card-text>
 
@@ -80,23 +84,32 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" flat @click="updateAccount">Save</v-btn>
-          <v-btn color="secondary" flat @click="editDialog = false">Cancel</v-btn>
+          <v-btn color="primary" flat @click="saveAccount(false)">Save</v-btn>
+          <v-btn color="secondary" flat @click="hideEditDialog">Cancel</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-btn @click="deleteAccount(selected[0].accountId)" :disabled="selected.length == 0">Delete</v-btn>
+    <v-btn @click="deleteAccount(selected.accountId)" :disabled="selected.accountId === -1">Delete</v-btn>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapState } from "vuex";
+
+function createTemplateAccount() {
+  return {
+    accountId: -1,
+    name: "New account",
+    type: "Asset"
+  };
+}
 
 export default {
   data() {
     return {
-      selected: [],
+      selected: createTemplateAccount(),
+      selectedType: null,
       addDialog: false,
       editDialog: false,
       headers: [
@@ -108,27 +121,41 @@ export default {
   },
   methods: {
     deleteAccount() {
-      this.$store.dispatch("deleteAccount", this.selected[0].accountId);
-      this.selected = [];
+      this.$store.dispatch("deleteAccount", this.selected.accountId);
+      this.selected = createTemplateAccount();
     },
     select(item) {
-      this.selected = [];
-      this.selected.push(item);
+      this.selected = item;
     },
     isSelected(item) {
-      if (this.selected.length > 0) {
-        return (
-          this.selected.filter(itm => itm.accountId === item.accountId).length >
-          0
-        );
+      return this.selected.accountId === item.accountId;
+    },
+    saveAccount(isNew) {
+      const a = {
+        accountId: this.selected.accountId,
+        name: this.selected.name,
+        type: this.selected.type
+      };
+
+      if (isNew) {
+        this.$store.dispatch("addAccount", a);
+      } else {
+        this.$store.dispatch("updateAccount", a);
       }
-      return false;
+
+      if (isNew) {
+        this.addDialog = false;
+      } else {
+        this.editDialog = false;
+      }
     },
-    updateAccount() {
-      editDialog = false;
+    hideAddDialog() {
+      this.addDialog = false;
+      this.selected = createTemplateAccount();
     },
-    addAccount() {
-      addDialog = false;
+    hideEditDialog() {
+      this.editDialog = false;
+      this.selected = createTemplateAccount();
     }
   },
   computed: {

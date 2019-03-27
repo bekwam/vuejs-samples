@@ -4,8 +4,8 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+  strict: true,
   state: {
-    nextAccountId: 1,
     transactions: [
       {
         journalEntryId: 900,
@@ -48,7 +48,7 @@ export default new Vuex.Store({
         type: "Expense"
       }
     ],
-    accountTypes: ["Asset", "Revenue", "Expense"]
+    accountTypes: ["Asset", "Revenue", "Liability", "Expense", "Equity"]
   },
   mutations: {
     DELETE_ACCOUNT(state, id) {
@@ -57,14 +57,15 @@ export default new Vuex.Store({
       );
     },
     ADD_ACCOUNT(state, account) {
-      account.accountId = state.nextAccountId++;
       state.accounts.push(account);
+      state.accounts.sort((a, b) => b.accountId - a.accountId);
     },
     UPDATE_ACCOUNT(state, account) {
-      var store_a = state.accounts.find(a => a.accountId == account.accountId);
-      if (store_a != null) {
-        store_a.accountName = account.name;
-        store_a.accountType = account.type;
+      let index = state.accounts.findIndex(
+        a => a.accountId == account.accountId
+      );
+      if (index != -1) {
+        Vue.set(state.accounts, index, account);
       }
     }
   },
