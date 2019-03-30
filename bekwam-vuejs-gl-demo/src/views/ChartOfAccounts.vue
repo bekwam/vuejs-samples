@@ -1,6 +1,5 @@
 <template>
   <div>
-    {{ accounts[1].name }}
     <v-data-table :headers="headers" :items="accounts" item-key="accountId">
       <template v-slot:items="props">
         <tr :class="{'table-primary' : isSelected(props.item)}" @click="select(props.item)">
@@ -99,7 +98,7 @@ import { mapState } from "vuex";
 
 function createTemplateAccount() {
   return {
-    accountId: -1,
+    accountId: null,
     name: "New account",
     type: "Asset"
   };
@@ -109,7 +108,6 @@ export default {
   data() {
     return {
       selected: createTemplateAccount(),
-      selectedType: null,
       addDialog: false,
       editDialog: false,
       headers: [
