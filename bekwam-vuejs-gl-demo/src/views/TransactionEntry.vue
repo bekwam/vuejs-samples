@@ -2,7 +2,6 @@
   <div>
     <v-container ref="mycontainer">
       <v-layout row pa-1>
-        <v-flex xs12>&nbsp;</v-flex>
         <v-flex xs12>
           <v-menu
             v-model="menu2"
@@ -26,6 +25,7 @@
             <v-date-picker v-model="date" @input="menu2 = false"></v-date-picker>
           </v-menu>
         </v-flex>
+        <v-flex xs12>&nbsp;</v-flex>
         <v-flex xs12>&nbsp;</v-flex>
         <v-flex xs12>&nbsp;</v-flex>
         <v-flex xs12>&nbsp;</v-flex>
