@@ -10,13 +10,13 @@
       </v-select>
     </v-flex>
     <v-flex xs12 mr-1>
-      <v-text-field single-line outline></v-text-field>
+      <v-text-field single-line outline v-model="memo"></v-text-field>
     </v-flex>
     <v-flex xs12 mr-1>
-      <v-text-field single-line outline></v-text-field>
+      <v-text-field single-line outline v-model="debit" @change="updateDebit"></v-text-field>
     </v-flex>
     <v-flex xs12 mr-1>
-      <v-text-field single-line outline></v-text-field>
+      <v-text-field single-line outline v-model="credit" @change="updateCredit"></v-text-field>
     </v-flex>
     <v-flex xs12>
       <v-btn @click="removeJE(lineNo)">Remove</v-btn>
@@ -31,7 +31,10 @@ export default {
   props: ["id"],
   data() {
     return {
-      type: null
+      type: null,
+      memo: null,
+      debit: null,
+      credit: null
     };
   },
   computed: {
@@ -40,6 +43,18 @@ export default {
   methods: {
     removeJE(id) {
       this.$root.$emit("remove-je-event", id);
+    },
+    updateDebit() {
+      this.$root.$emit("update-debits-event", {
+        transactionId: this.id,
+        amount: this.debit
+      });
+    },
+    updateCredit() {
+      this.$root.$emit("update-credits-event", {
+        transactionId: this.id,
+        amount: this.credit
+      });
     }
   }
 };

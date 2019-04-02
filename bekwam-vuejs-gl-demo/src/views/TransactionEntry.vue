@@ -50,10 +50,10 @@
         <v-flex xs12>Total</v-flex>
         <v-flex xs12>&nbsp;</v-flex>
         <v-flex xs12 mr-1>
-          <v-text-field single-line outline readonly></v-text-field>
+          <v-text-field single-line outline readonly v-model="debitsTotal"></v-text-field>
         </v-flex>
         <v-flex xs12 mr-1>
-          <v-text-field single-line outline readonly></v-text-field>
+          <v-text-field single-line outline readonly v-model="creditsTotal"></v-text-field>
         </v-flex>
         <v-flex xs12>&nbsp;</v-flex>
       </v-layout>
@@ -75,7 +75,9 @@ export default {
       jeId: 1,
       journalEntries: [],
       menu2: false,
-      date: null
+      date: null,
+      debits: {},
+      credits: {}
     };
   },
   components: {
@@ -83,10 +85,28 @@ export default {
   },
   created() {
     this.$root.$on("remove-je-event", this.removeJE);
+    this.$root.$on("update-debits-event", this.updateDebits);
+    this.$root.$on("update-credits-event", this.updateCredits);
   },
   mounted() {
     this.addJE(this.jeId++);
     this.addJE(this.jeId++);
+  },
+  computed: {
+    debitsTotal() {
+      if (Object.entries(this.debits).length === 0) {
+        return null;
+      }
+      return Object.values(this.debits).reduce((a, b) => Number(a) + Number(b));
+    },
+    creditsTotal() {
+      if (Object.entries(this.credits).length === 0) {
+        return null;
+      }
+      return Object.values(this.credits).reduce(
+        (a, b) => Number(a) + Number(b)
+      );
+    }
   },
   methods: {
     addJE(id) {
@@ -104,6 +124,12 @@ export default {
         this.$refs.mycontainer.removeChild(component.$el);
         component.$destroy();
       }
+    },
+    updateDebits(debitObj) {
+      Vue.set(this.debits, debitObj.transactionId, debitObj.amount);
+    },
+    updateCredits(creditObj) {
+      Vue.set(this.credits, creditObj.transactionId, creditObj.amount);
     }
   }
 };
