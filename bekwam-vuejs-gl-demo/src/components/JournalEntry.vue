@@ -19,7 +19,7 @@
       <v-text-field single-line outline v-model="credit" @change="updateCredit"></v-text-field>
     </v-flex>
     <v-flex xs12>
-      <v-btn @click="removeJE(lineNo)">Remove</v-btn>
+      <v-btn @click="removeJE(id)">Remove</v-btn>
     </v-flex>
   </v-layout>
 </template>

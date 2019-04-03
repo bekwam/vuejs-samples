@@ -119,8 +119,10 @@ export default {
       this.$refs.mycontainer.insertBefore(je.$el, this.$refs.myhr);
     },
     removeJE(jeId) {
-      let component = this.$children.find(child => child.jeId === jeId);
+      let component = this.$children.find(child => child.id === jeId);
       if (component) {
+        Vue.delete(this.debits, jeId);
+        Vue.delete(this.credits, jeId);
         this.$refs.mycontainer.removeChild(component.$el);
         component.$destroy();
       }
