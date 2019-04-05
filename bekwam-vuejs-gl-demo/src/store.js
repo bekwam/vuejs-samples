@@ -9,22 +9,26 @@ export default new Vuex.Store({
     nextTransactionId: 2,
     transactions: [
       {
-        journalEntryId: 900,
         transactionId: 1,
         transactionDate: "2019-03-21",
-        accountId: 500,
-        account: "Office expense",
-        debit: 0,
-        credit: 17.5
-      },
-      {
-        journalEntryId: 901,
-        transactionId: 1,
-        transactionDate: "2019-03-21",
-        accountId: 100,
-        account: "Cash",
-        debit: 17.5,
-        credit: 0
+        journalEntries: [
+          {
+            journalEntryId: 900,
+            accountId: 500,
+            account: "Office expense",
+            debit: 17.5,
+            credit: null,
+            memo: "OFFICE SUPPLIES"
+          },
+          {
+            journalEntryId: 901,
+            accountId: 100,
+            account: "Cash",
+            debit: null,
+            credit: 17.5,
+            memo: "OFFICE SUPPLIES"
+          }
+        ]
       }
     ],
     accounts: [

@@ -1,5 +1,5 @@
 <template>
-  <v-data-table :headers="headers" :items="this.$store.state.transactions">
+  <v-data-table :headers="headers" :items="denormalizedTransactions">
     <template v-slot:items="props">
       <td>{{ props.item.transactionId }}</td>
       <td>{{ props.item.transactionDate }}</td>
@@ -23,6 +23,25 @@ export default {
         { text: "Credit", value: "credit" }
       ]
     };
+  },
+  computed: {
+    denormalizedTransactions() {
+      let dts = [];
+      this.$store.state.transactions.forEach(t => {
+        t.journalEntries.forEach(je => {
+          let dt = {};
+          dt.transactionId = t.transactionId;
+          dt.transactionDate = t.transactionDate;
+          dt.accountId = je.accountId;
+          dt.account = je.account;
+          dt.debit = je.debit;
+          dt.credit = je.credit;
+          dts.push(dt);
+        });
+      });
+
+      return dts;
+    }
   }
 };
 </script>

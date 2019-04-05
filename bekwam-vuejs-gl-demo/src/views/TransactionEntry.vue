@@ -163,9 +163,21 @@ export default {
       this.addJE(this.jeId++);
     },
     save() {
+      let jeData = this.$children
+        .filter(child => child.className === "JournalEntry")
+        .map(je => ({
+          accountId: je.type.accountId,
+          account: je.type.name,
+          debit: je.debit,
+          credit: je.credit,
+          memo: je.memo,
+          journalEntryId: je.id
+        }));
+
       let t = {
         transactionId: -1,
-        transactionDate: this.date
+        transactionDate: this.date,
+        journalEntries: jeData
       };
       this.$store.dispatch("addTransaction", t);
     }
