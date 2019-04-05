@@ -31,6 +31,7 @@ export default {
   props: ["id"],
   data() {
     return {
+      className: "JournalEntry",
       type: null,
       memo: null,
       debit: null,

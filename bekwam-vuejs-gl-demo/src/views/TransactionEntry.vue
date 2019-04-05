@@ -32,7 +32,6 @@
         <v-flex xs12>&nbsp;</v-flex>
       </v-layout>
       <v-layout row pa-1>
-        <v-flex xs12>&nbsp;</v-flex>
         <v-flex xs12>Account</v-flex>
         <v-flex xs12>Memo</v-flex>
         <v-flex xs12>Debit</v-flex>
@@ -55,12 +54,17 @@
         <v-flex xs12 mr-1>
           <v-text-field single-line outline readonly v-model="creditsTotal"></v-text-field>
         </v-flex>
+        <v-flex xs12>
+          <span v-if="isBalanced === null">&nbsp;</span>
+          <v-icon v-if="isBalanced === true" large color="success">check_circle</v-icon>
+          <v-icon v-if="isBalanced === false" large color="error">error</v-icon>
+        </v-flex>
         <v-flex xs12>&nbsp;</v-flex>
       </v-layout>
 
       <v-btn @click="addJE(jeId++)">Add Entry</v-btn>
-      <v-btn>Save</v-btn>
-      <v-btn>Cancel</v-btn>
+      <v-btn :disabled="isBalanced === null || isBalanced === false" @click="save">Save</v-btn>
+      <v-btn @click="reset">Cancel</v-btn>
     </v-container>
   </div>
 </template>
@@ -73,7 +77,6 @@ export default {
   data() {
     return {
       jeId: 1,
-      journalEntries: [],
       menu2: false,
       date: null,
       debits: {},
@@ -106,6 +109,15 @@ export default {
       return Object.values(this.credits).reduce(
         (a, b) => Number(a) + Number(b)
       );
+    },
+    isBalanced() {
+      if (
+        Object.entries(this.debits).length === 0 ||
+        Object.entries(this.credits).length === 0
+      ) {
+        return null;
+      }
+      return this.debitsTotal === this.creditsTotal;
     }
   },
   methods: {
@@ -119,7 +131,9 @@ export default {
       this.$refs.mycontainer.insertBefore(je.$el, this.$refs.myhr);
     },
     removeJE(jeId) {
-      let component = this.$children.find(child => child.id === jeId);
+      let component = this.$children.find(
+        child => child.className === "JournalEntry" && child.id === jeId
+      );
       if (component) {
         Vue.delete(this.debits, jeId);
         Vue.delete(this.credits, jeId);
@@ -128,10 +142,32 @@ export default {
       }
     },
     updateDebits(debitObj) {
-      Vue.set(this.debits, debitObj.transactionId, debitObj.amount);
+      Vue.set(this.debits, debitObj.transactionId, Number(debitObj.amount));
     },
     updateCredits(creditObj) {
-      Vue.set(this.credits, creditObj.transactionId, creditObj.amount);
+      Vue.set(this.credits, creditObj.transactionId, Number(creditObj.amount));
+    },
+    reset() {
+      this.$children
+        .filter(child => child.className === "JournalEntry")
+        .forEach(child => this.removeJE(child.id));
+
+      this.jeId = 1;
+      this.journalEntries = [];
+      this.menu2 = false;
+      this.date = null;
+      this.debits = {};
+      this.credits = {};
+
+      this.addJE(this.jeId++);
+      this.addJE(this.jeId++);
+    },
+    save() {
+      let t = {
+        transactionId: -1,
+        transactionDate: this.date
+      };
+      this.$store.dispatch("addTransaction", t);
     }
   }
 };

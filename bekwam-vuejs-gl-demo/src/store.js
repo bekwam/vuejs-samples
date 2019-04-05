@@ -6,11 +6,12 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   strict: true,
   state: {
+    nextTransactionId: 2,
     transactions: [
       {
         journalEntryId: 900,
-        transactionId: 100,
-        transactionDate: "2019-03-21 12:00:00",
+        transactionId: 1,
+        transactionDate: "2019-03-21",
         accountId: 500,
         account: "Office expense",
         debit: 0,
@@ -18,8 +19,8 @@ export default new Vuex.Store({
       },
       {
         journalEntryId: 901,
-        transactionId: 100,
-        transactionDate: "2019-03-21 12:00:00",
+        transactionId: 1,
+        transactionDate: "2019-03-21",
         accountId: 100,
         account: "Cash",
         debit: 17.5,
@@ -67,6 +68,11 @@ export default new Vuex.Store({
       if (index != -1) {
         Vue.set(state.accounts, index, account);
       }
+    },
+    ADD_TRANSACTION(state, transaction) {
+      let id = state.nextTransactionId++;
+      transaction.transactionId = id;
+      state.transactions.push(transaction);
     }
   },
   actions: {
@@ -78,6 +84,9 @@ export default new Vuex.Store({
     },
     updateAccount(context, account) {
       context.commit("UPDATE_ACCOUNT", account);
+    },
+    addTransaction(context, transaction) {
+      context.commit("ADD_TRANSACTION", transaction);
     }
   }
 });
