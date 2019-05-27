@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Dynamic List App</title>
+<style>
+	ul {
+		list-style-type: none;
+		padding: 0;
+	}
+	ul > li {
+		line-height: 2em;
+	}
+	.link-box {
+		width: 250px; 
+		display: inline-block; 
+	}
+	.hdn {
+		visibility: hidden;
+	}
+	.link-box-selected {
+    	background-color: blue;
+    	color: white;
+	}
+	.go {
+		color: white;
+		background-color: green;
+	}	
+</style>
+</head>
+<body>
+	<div id="app"></div>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>
