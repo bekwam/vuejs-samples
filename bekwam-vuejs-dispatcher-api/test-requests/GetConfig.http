@@ -1,0 +1,8 @@
+GET http://localhost:8080/dispatcher-api/api/config/123
+Accept: application/json
+
+###
+GET http://localhost:8080/dispatcher-api/api/config/XXX
+Accept: application/json
+
+###
